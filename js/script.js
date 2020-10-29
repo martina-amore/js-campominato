@@ -6,55 +6,89 @@
 // La partita termina quando il giocatore inserisce un numero "vietato" o raggiunge il numero massimo possibile di numeri consentiti.
 // Al termine della partita il software deve comunicare il punteggio, cioè il numero di volte che l'utente ha inserito un numero consentito.
 
-var MAX_ROUND = 3;
+// VARIABILI FISSE
+var RANDOM_NUMBERS = 16;
+var LIMITE_MIN = 1;
+var LIMITE_MAX = 100;
+var GIRI = 84;
 
-// FUNZIONE PER CREARE UN NUMERO CASUALE
-function numeroRandom(min, max) {
-    var min = Math.ceil(min);
-    var max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+// BONUS:
+// all'inizio il software richiede anche una difficoltà all'utente che cambia il range di numeri casuali:
+// con difficoltà 0 => tra 1 e 100
+// con difficoltà 1 =>  tra 1 e 80
+// con difficoltà 2 => tra 1 e 50
+
+// INSERISCO LA DIFFICOLTA'
+var difficoltà = prompt("Inserisci la difficoltà: 0, 1, 2");
+// SE SI SCEGLIE 0, IL RANGE MASSIMO DEI NUMERI CASUALI E' 100
+if (difficoltà == 0) {
+    LIMITE_MAX = 100;
+}
+// SE SI SCEGLIE 1, IL RANGE MASSIMO DEI NUMERI CASUALI E' 80
+else if (difficoltà == 1) {
+    LIMITE_MAX = 80;
+}
+// SE SI SCEGLIE 2, IL RANGE MASSIMO DEI NUMERI CASUALI E' 50
+else {
+    LIMITE_MAX = 50;
 }
 
+// INIZIALIZZO L'ARRAY DEI NUMERI CASUALI
 var arrayNumeriCasuali = [];
-
-for (var i = 0; i < 16; i++) {
-    // Il computer deve generare 16 numeri casuali tra 1 e 100
-    arrayNumeriCasuali.push(numeroRandom(1, 100));
-    arrayNumeriCasuali.sort();
+// INSTAURO UN CICLO WHILE CON IL QUALE, SE IL NUMERO NON E' NELL'ARRAY
+// DEI NUMERI CASUALI, VIENE INSERITO IN ESSO
+while (arrayNumeriCasuali.length < RANDOM_NUMBERS) {
+    var numeroCasualeAttuale = (numeroRandom(LIMITE_MIN, LIMITE_MAX));
+    if (!isNumberInArray(numeroCasualeAttuale, arrayNumeriCasuali)) {
+        arrayNumeriCasuali.push(numeroCasualeAttuale);
     }
+}
 console.log("arrayNumeriCasuali", arrayNumeriCasuali);
 
-var isInRandomList;
+// INIZIALIZZO L'ARRAY DEI NUMERI IMMESSI DALL'UTENTE
+// E LE VARIABILI NECESSARIE AL CICLO WHILE
+var utenteHaVinto = false;
+var utenteEVivo = true;
 var arrayNumeriUtente = [];
-for (var f = 0; f < MAX_ROUND; f++) {
-    var numeriUtente = parseInt(prompt("Inserisci un numero tra 1 e 100:"));
-    arrayNumeriUtente.push(numeriUtente);
-    console.log("arrayNumeriUtente", arrayNumeriUtente);
-    for (var j = 0; j < arrayNumeriCasuali.length; j++) {
-        if (numeriUtente == arrayNumeriCasuali[j]) {
-            // console.log("vero");
-            // isInRandomList = true;
-            // alert("Hai perso");
+
+// INSTAURO UN CICLO WHILE CON IL QUALE, FINCHE' L'UTENTE NON IMMETTE
+// UN NUMERO CHE E' DENTRO L'ARRAY DEI NUMERI CASUALI, PUO' CONTINUARE A
+// GIOCARE, QUINDI IL CICLO NON SI INTERROMPE
+while (!utenteHaVinto && utenteEVivo) {
+    var sceltaNumeroUtente = parseInt(prompt("Inserisci un numero tra " + LIMITE_MIN + " e " + LIMITE_MAX + ":"));
+//
+    // SE L'UTENTE INSERISCE DOPPIONE, SPUNTA QUEST'ALERT
+    if (isNumberInArray(sceltaNumeroUtente, arrayNumeriUtente)) {
+        alert("Hai già inserito questo numero. Inseriscine un altro:");
+    }
+    // SE L'UTENTE NON INSERISCE DOPPIONI, IL NUMERO VIENE INSERITO
+    // NELL'ARRAY DEI NUMERI UTENTE. CI SONO DUE CASI:
+    else {
+        arrayNumeriUtente.push(sceltaNumeroUtente);
+        // 1° CASO: SE IL NUMERO INSERITO E' PRESENTE NELL'ARRAY DEI NUM.
+        // CASUALI, L'UTENTE PERDE E IL GIOCO TERMINA
+        if (isNumberInArray(sceltaNumeroUtente, arrayNumeriCasuali)) {
+            utenteEVivo = false;
+        // 2° CASO: IL GIOCO TERMINA QUANDO L'UTENTE RAGGIUNGE IL NUMERO
+        // MAX DI GIRI
         }
-        // else {
-        //     isInRandomList = false;
-        //     console.log("falso");
-        // }
+        else if (arrayNumeriUtente.length === GIRI){
+            utenteHaVinto = true;
+        }
     }
 }
+console.log("vivo", utenteEVivo);
+console.log("ha vinto", utenteHaVinto);
 
-if (isInRandomList == true) {
-    document.getElementById("risultato").innerHTML = "Hai perso";
-    document.getElementById("punteggio").innerHTML = "";
+// // STAMPO NELL'HTML I MESSAGGI CON I VARI RISULTATI
+var message = document.getElementById("messaggio");
+var times = document.getElementById("punteggio");
+
+if (utenteHaVinto && utenteEVivo) {
+    message.innerHTML = "Congratulazioni, hai vinto!";
+}
+else {
+    message.innerHTML = "Hai fatto esplodere la mina, hai perso!"
 }
 
-
-
-// console.log("arrayNumeriUtente", arrayNumeriUtente);
-    // Se il numero è presente nella lista dei numeri generati, la partita termina
-    // altrimenti si continua chiedendo all'utente un altro numero.
-
-// }
-
-// console.log("arrayNumeriUtente", arrayNumeriUtente);
-// console.log("arrayNumeriUtente[f]", arrayNumeriUtente[f]);
+times.innerHTML += "Il tuo punteggio è: " + parseInt(arrayNumeriUtente.length - 1);
