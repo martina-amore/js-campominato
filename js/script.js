@@ -10,7 +10,6 @@
 var RANDOM_NUMBERS = 16;
 var LIMITE_MIN = 1;
 var LIMITE_MAX = 100;
-var GIRI = 84;
 
 // BONUS:
 // all'inizio il software richiede anche una difficoltà all'utente che cambia il range di numeri casuali:
@@ -32,6 +31,8 @@ else if (difficoltà == 1) {
 else {
     LIMITE_MAX = 50;
 }
+
+var GIRI = LIMITE_MAX - 16;
 
 // INIZIALIZZO L'ARRAY DEI NUMERI CASUALI
 var arrayNumeriCasuali = [];
@@ -69,26 +70,16 @@ while (!utenteHaVinto && utenteEVivo) {
         // CASUALI, L'UTENTE PERDE E IL GIOCO TERMINA
         if (isNumberInArray(sceltaNumeroUtente, arrayNumeriCasuali)) {
             utenteEVivo = false;
+            document.getElementById("messaggio").innerHTML = "Hai fatto esplodere la mina, hai perso!";
         // 2° CASO: IL GIOCO TERMINA QUANDO L'UTENTE RAGGIUNGE IL NUMERO
         // MAX DI GIRI
         }
         else if (arrayNumeriUtente.length === GIRI){
             utenteHaVinto = true;
+            document.getElementById("messaggio").innerHTML = "Congratulazioni, hai vinto!";
         }
     }
 }
 console.log("vivo", utenteEVivo);
 console.log("ha vinto", utenteHaVinto);
-
-// // STAMPO NELL'HTML I MESSAGGI CON I VARI RISULTATI
-var message = document.getElementById("messaggio");
-var times = document.getElementById("punteggio");
-
-if (utenteHaVinto && utenteEVivo) {
-    message.innerHTML = "Congratulazioni, hai vinto!";
-}
-else {
-    message.innerHTML = "Hai fatto esplodere la mina, hai perso!"
-}
-
-times.innerHTML += "Il tuo punteggio è: " + parseInt(arrayNumeriUtente.length - 1);
+document.getElementById("punteggio").innerHTML += "Il tuo punteggio è: " + parseInt(arrayNumeriUtente.length - 1);
